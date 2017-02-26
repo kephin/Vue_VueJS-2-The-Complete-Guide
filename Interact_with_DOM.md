@@ -3,6 +3,7 @@
 |#|Catalog|
 |---|---|
 |1.|[Output data](./Interact_with_DOM.md#output-data)|
+|2.|[Listen to events](./Interact_with_DOM.md#listen-to-events)|
 
 ###Output data
 1. **{{ }}** is called string interpolation. We can use this syntax to export the data property to our template.
@@ -131,6 +132,206 @@
     data: {
       link: 'http://google.com',
       htmlLink: '<a href="http://google.com">Google</a>',
+    },
+  });
+  ```
+
+###Listen to events
+1. Listening to events from the templates: **v-on:DOM-event**
+
+  ```html
+  <!-- html -->
+  <div id="app">
+    <button v-on:click='increase'>Click me!</button>
+    <!-- or just use at(@) as abbreviation -->
+    <button @click='increase'>Click me!</button>
+    <p>{{ counter }}</p>
+  </div>
+  ```
+
+  ```javascript
+  //js
+  const app = new Vue({
+    el: '#app',
+    data: {
+      counter: 0,
+    },
+    methods: {
+      increase() {
+        this.counter++;
+      },
+    },
+  });
+  ```
+2. Getting event data from the **[event object](http://www.w3schools.com/jsref/dom_obj_event.asp)**
+  ```html
+  <!-- html -->
+  <div id="app">
+    <p v-on:mousemove='updateCoordinates'>Coordinates: ({{ x }}, {{ y }})</p>
+  </div>
+  ```
+
+  ```javascript
+  //js
+  const app = new Vue({
+    el: '#app',
+    data: {
+      x: 0,
+      y: 0,
+    },
+    methods: {
+      updateCoordinates(evt) {
+        this.x = evt.clientX;
+        this.y = evt.clientY;
+        },
+    },
+  });
+  ```
+3. Passing **both** your **own arguments** and the **event object** by *$event*
+
+  ```html
+  <!-- html -->
+  <div id="app">
+    <!-- $event is the preserved name -->
+    <button v-on:click='increase(2, $event)'>Click me!</button>
+    <p>{{ counter }}</p>
+  </div>
+  ```
+
+  ```javascript
+  //js
+  const app = new Vue({
+    el: '#app',
+    data: {
+      counter: 0,
+    },
+    methods: {
+      increase(step, evt) {
+        this.counter = step * evt.clientX;
+      },
+    },
+  });
+  ```
+4. Modifying events - with [event modifiers](https://vuejs.org/v2/guide/events.html#Event-Modifiers). For example, if we want to stop propagae some events:
+
+  ```html
+  <!-- html -->
+  <div id="app">
+    <p v-on:mousemove='updateCoordinates'>Coordinates: ({{ x }}, {{ y }})
+      <span v-on:mousemove.stop=''>DEAD SPOT</span>
+    </p>
+  </div>
+  ```
+5. Listening to keyboard events - with [key modifiers](https://vuejs.org/v2/guide/events.html#Key-Modifiers)
+
+  ```html
+  <!-- html -->
+  <div id="app">
+    <input type="text" v-on:keyup.enter='alertMe'>
+  </div>
+  ```
+6. Using **v-model** for two-way-binding
+
+  ```html
+  <!-- html -->
+  <div id="app">
+    <div id="app">
+    <input type="text" v-model='name'>
+    <p> {{ name }}</p>
+  </div>
+  </div>
+  ```
+
+  ```javascript
+  //js
+  const app = new Vue({
+    el: '#app',
+    data: {
+      name: '',
+    },
+  });
+  ```
+7. You can put any valid JavaScript code in all the places where you can access Vue instance as long as it is only one expression and doesn't contain if-else statements or for-loops.
+
+  ```html
+  <!-- html -->
+  <div id="app">
+    <p>{{ x > 0 ? x : 0 }}</p>
+    <button v-on:click='x++'>plus one</button>
+  </div>
+  ```
+8. [**Computed properties**](https://vuejs.org/v2/guide/computed.html#Computed-Caching-vs-Methods): the difference between computed properties and methods is that computed properties are **cached based on their dependencies**.
+
+  A computed property will only re-evaluate when some of its dependencies have changed. As long as its dependencies has not changed, it will immediately return the previously computed result without having to run the function again.
+
+  In comparison, a method invocation will always run the function whenever a re-render happens.
+
+  ```html
+  <div id="app">
+    <button v-on:click='counter++'>increase</button>
+    <button v-on:click='counter--'>decrease</button>
+    <button v-on:click='value++'>haha</button>
+  </div>
+  ```
+
+  ```javascript
+  const app = new Vue({
+    el: '#app',
+    data: {
+      counter: 0,
+      value: 0,
+    },
+    computed: {
+      // this will NOT run when push haha button
+      output(){
+        return this.counter > 5 ? 'Greater than 5' : 'Not Greater than 5';
+      },
+    },
+    methods: {
+      // this will run when push haha button
+      result(){
+        return this.counter > 5 ? 'Greater than 5' : 'Not Greater than 5';
+      },
+    },
+  });
+  ```
+9. [**Computed setter**](https://vuejs.org/v2/guide/computed.html#Computed-Setter): computed properties are by default getter-only, but you can also use setter:
+
+  ```javascript
+  computed: {
+    fullName: {
+      // getter
+      get() {
+        return `this.firstName this.lastName`;
+      },
+      // setter
+      set(newValue) {
+        const names = newValue.split(' ');
+        this.firstName = names[0]
+        this.lastName = names[names.length - 1]
+      },
+    },
+  },
+  ```
+10. [**Watchers**](https://vuejs.org/v2/guide/computed.html#Watchers): useful when you want to perform asynchronous or expensive operations in response to changing data.
+
+  ```javascript
+  new Vue({
+    el: '#exercise',
+    data: {
+      value: 0,
+    },
+    computed: {
+      result() {
+        return this.value >= 37 ? 'done' : 'not there yet';
+      },
+    },
+    watch: {
+      result(){
+        setTimeout(() => {
+          this.value = 0;
+        }, 5000)
+      }
     },
   });
   ```
