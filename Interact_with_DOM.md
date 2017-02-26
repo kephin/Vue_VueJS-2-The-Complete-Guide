@@ -4,6 +4,8 @@
 |---|---|
 |1.|[Output data](./Interact_with_DOM.md#output-data)|
 |2.|[Listen to events](./Interact_with_DOM.md#listen-to-events)|
+|3.|[Dynamic styling](./Interact_with_DOM.md#dynamic-styling)|
+
 
 ###Output data
 1. **{{ }}** is called string interpolation. We can use this syntax to export the data property to our template.
@@ -334,4 +336,145 @@
       }
     },
   });
+  ```
+
+###Dynamic styling
+
+**With CSS classes**
+
+1. [**Object syntax**](https://vuejs.org/v2/guide/class-and-style.html#Object-Syntax)
+
+  ```html
+  <!-- html -->
+  <div id="app">
+    <div
+      class="demo"
+      @click="attachRed = !attachRed"
+      :class="{red: attachRed}">
+    </div>
+  </div>
+  ```
+
+  ```CSS
+  /*css*/
+  .demo {
+    display: inline-block;
+    background-color: #aaa;
+    height: 100px;
+    width: 100px;
+    margin: 10px;
+  }
+
+  .red {
+    background-color: red;
+  }
+
+  .blue {
+    background-color: blue;
+  }
+  ```
+
+  ```javascript
+  //javascript
+  new Vue({
+    el: '#app',
+    data: {
+      attachRed: false,
+    },
+  });
+  ```
+2. As the CSS class object grows, we can create a computed property
+  >Object syntax is often used in conjunction with computed properties that return objects
+
+  ```html
+  <!-- html -->
+  <div id="app">
+    <div
+      class="demo"
+      @click="attachRed = !attachRed"
+      :class="divClasses">
+    </div>
+  </div>
+  ```
+
+  ``` javascript
+  //javascript
+  new Vue({
+    el: '#app',
+    data: {
+      attachRed: false,
+    },
+    computed: {
+      divClasses() {
+        return {
+          red: this.attachRed,
+          blue: !this.attachRed,
+        };
+      },
+    },
+  });
+  ```
+3. Or we can use [**Array syntax**](https://vuejs.org/v2/guide/class-and-style.html#Array-Syntax)
+
+  ```html
+  <!-- html -->
+  <div class="demo" :class="[color, shape]"></div>
+  ```
+
+  ```javascript
+  //javascript
+  data: {
+    color: 'red',
+    shape: 'normal',
+  }
+  ```
+4. Or use the object syntax inside array syntax
+
+  ```html
+  <!-- html -->
+  <div :class="[{ active: isActive }, errorClass]">
+  ```
+
+**With inline styles**
+
+1. Object Syntax: We can bind inline styles, too
+
+  ```html
+  <!-- html -->
+  <div :style="{ color: activeColor, fontSize: fontSize + 'px' }"></div>
+  <div :style="styleObject"></div>
+  ```
+
+  ```javascript
+  //javascript
+  data: {
+    activeColor: 'red',
+    fontSize: 30,
+  },
+  computed: {
+    styleObject: {
+      color: 'red',
+      fontSize: '13px',
+    },
+  },
+  ```
+
+2. Array Syntax: put objects inside
+  ```html
+  <!-- html -->
+  <div v-bind:style="[baseStyles, errorStyles]">
+  ```
+
+  ```javascript
+  //javascript
+  data: {
+    baseStyles: {
+      width: '10px',
+      height: '30px',
+    },
+    errorStyles: {
+      backgroundColor: 'red',
+      fontSize: '13px',
+    },
+  },
   ```
